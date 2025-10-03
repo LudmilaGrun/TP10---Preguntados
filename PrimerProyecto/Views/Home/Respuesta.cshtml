@@ -1,0 +1,24 @@
+@{
+    ViewData["Title"] = "Respuesta";
+    bool ok = ViewBag.Ok is bool && (bool)ViewBag.Ok;
+    var correcta = ViewBag.Correcta as TP10_PreguntadORT.Models.Respuesta;
+}
+
+<h1>Respuesta</h1>
+
+@if (ok)
+{
+    <p>¡Correcto!</p>
+}
+else
+{
+    <p>Incorrecto</p>
+    @if (correcta != null)
+    {
+        <p>La correcta era: @correcta.Contenido</p>
+    }
+}
+
+<form method="get" action='@Url.Action("Jugar","Home")'>
+    <p><button type="submit">Siguiente pregunta</button></p>
+</form>

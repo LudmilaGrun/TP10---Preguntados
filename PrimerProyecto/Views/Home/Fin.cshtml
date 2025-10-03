@@ -1,0 +1,14 @@
+@{
+    ViewData["Title"] = "Fin";
+    string username = ViewBag.Username;
+    int puntaje = ViewBag.Puntaje;
+}
+
+<h1>Fin del Juego</h1>
+
+<p>Usuario: @username</p>
+<p>Puntaje final: @puntaje</p>
+
+<form method="get" action='@Url.Action("ConfigurarJuego","Home")'>
+    <p><button type="submit">Volver a jugar</button></p>
+</form>

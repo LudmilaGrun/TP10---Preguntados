@@ -1,0 +1,25 @@
+@{
+    ViewData["Title"] = "ConfigurarJuego";
+    var categorias = ViewBag.Categorias as List<TP10_PreguntadORT.Models.Categoria>;
+}
+
+<h1>Configurar Juego</h1>
+
+<form method="get" action='@Url.Action("Comenzar","Home")'>
+    <p>Nombre:</p>
+    <input type="text" name="username" required />
+
+    <p>Categoría:</p>
+    <select name="categoria" required>
+        <option value="-1">Todas</option>
+        @if (categorias != null)
+        {
+            foreach (var c in categorias)
+            {
+                <option value="@c.IdCategoria">@c.Nombre</option>
+            }
+        }
+    </select>
+
+    <p><button type="submit">Jugar</button></p>
+</form>
