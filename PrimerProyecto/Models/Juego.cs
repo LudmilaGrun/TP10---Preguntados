@@ -23,9 +23,9 @@ public class Juego{
         ListaRespuestas = null;
     }
 
-    public List<Categoria> ObtenerCategorias()
+    public static List<Categoria> ObtenerCategorias()
     {
-        return BD.ObtenerCategorias();
+            return BD.ObtenerCategorias1();
     }
     public void CargarPartida(string UsernameElegido, int Categoria)
     {

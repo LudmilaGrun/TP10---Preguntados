@@ -9,10 +9,10 @@ using Newtonsoft.Json;
 namespace Proyecto.Models
 {
     public static class BD{
-    private static string _connectionString = @"A-PHZ2-CEO-21";
+    private static string _connectionString = @"A-PHZ2-CIDI-36";
 
    
-    public static List<Categoria> ObtenerCategorias(){
+    public static List<Categoria> ObtenerCategorias1(){
         List<Categoria> Categorias = new List<Categoria>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -21,7 +21,7 @@ namespace Proyecto.Models
                 Categorias = connection.Query<Categoria>(query).ToList();
             }
 
-            return categorias;
+            return Categorias;
     }
 
     public static List<Pregunta> ObtenerPreguntas(int Categoria){

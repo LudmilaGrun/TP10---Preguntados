@@ -7,12 +7,7 @@ namespace PrimerProyecto.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
-    {
-        _logger = logger;
-    }
+    private static Juego JuegoActual; 
 
     public IActionResult Index()
     {
@@ -21,19 +16,12 @@ public class HomeController : Controller
 
     public IActionResult ConfigurarJuego()
     {
-        if (JuegoActual == null)
-        {
-            Juego JuegoActual = new Juego();
-        }
-            else
-        {
-            Juego JuegoActual = new Juego();
-        }
-
-            ViewBag.Categorias = Juego.ObtenerCategorias();
-            return View();
-        
+        JuegoActual = new Juego();
+        ViewBag.Categorias = Juego.ObtenerCategorias(); 
+        return View();
     }
+
+    
 
     public IActionResult Comenzar(string Username, int Categoria)
     {
@@ -43,30 +31,30 @@ public class HomeController : Controller
         }
         else
         {
-            Juego JuegoActual = new Juego();
-            Juego.CargarPartida(Username, Categoria);
+            JuegoActual = new Juego();
+            JuegoActual.CargarPartida(Username, Categoria); 
             return RedirectToAction("Jugar");
         }
     }
 
     public IActionResult Jugar()
     {
-        Pregunta Pregunta = Juego.ObtenerProximaPregunta();
+        Pregunta pregunta = JuegoActual.ObtenerProximaPregunta();
 
-        if (Pregunta == null)
+        if (pregunta == null)
         {
-            ViewBag.Username = Juego.Username;
-            ViewBag.Puntaje = Juego.PuntajeActual;
+            ViewBag.Username = JuegoActual.Username;
+            ViewBag.Puntaje = JuegoActual.PuntajeActual;
             return View("Fin");
         }
 
-        List<Respuesta> Respuestas = Juego.ObtenerProximasRespuestas(Pregunta.IdPregunta);
+        List<Respuesta> respuestas = JuegoActual.ObtenerProximasRespuestas(pregunta.IdPregunta);
 
-        ViewBag.Username = Juego.Username;
-        ViewBag.Puntaje = Juego.PuntajeActual;
-        ViewBag.NroPregunta = Juego.NroPreguntaActual;
-        ViewBag.Pregunta = Pregunta;
-        ViewBag.Respuestas = Respuestas;
+        ViewBag.Username = JuegoActual.Username;
+        ViewBag.Puntaje = JuegoActual.PuntajeActual;
+        ViewBag.NroPregunta = JuegoActual.NroPreguntaActual;
+        ViewBag.Pregunta = pregunta;
+        ViewBag.Respuestas = respuestas;
 
         return View("Juego");
     }
@@ -74,8 +62,10 @@ public class HomeController : Controller
     [HttpPost]
     public IActionResult VerificarRespuesta(int idPregunta, int idRespuesta)
     {
-        bool EsCorrecta = Juego.VerificarRespuesta(idRespuesta);
-        ViewBag.Correcta = EsCorrecta;
+        bool esCorrecta = JuegoActual.VerificarRespuesta(idRespuesta);
+        ViewBag.Correcta = esCorrecta;
+        ViewBag.Username = JuegoActual.Username;
+        ViewBag.Puntaje = JuegoActual.PuntajeActual;
 
         return View("Respuesta");
     }

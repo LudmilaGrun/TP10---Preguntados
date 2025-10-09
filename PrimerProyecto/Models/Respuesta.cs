@@ -6,4 +6,12 @@ public class Respuesta{
     public bool Correcta { get; set; }
     public string Foto { get; set; }
     
+    public Respuesta (int pIdPregunta, int pOpcion, string pContenido, bool pCorrecta, string pFoto)
+    {
+        IdPregunta = pIdPregunta;
+        Opcion = pOpcion;
+        Contenido = pContenido;
+        Correcta = pCorrecta;
+        Foto = pFoto;
+    }
 }
