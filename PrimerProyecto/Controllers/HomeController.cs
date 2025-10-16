@@ -1,13 +1,17 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using PrimerProyecto.Models;
-using Newtonsoft.Json; 
 
 namespace PrimerProyecto.Controllers;
 
 public class HomeController : Controller
 {
-    private static Juego JuegoActual; 
+    private readonly ILogger<HomeController> _logger;
+
+    public HomeController(ILogger<HomeController> logger)
+    {
+        _logger = logger;
+    }
 
     public IActionResult Index()
     {
@@ -16,57 +20,67 @@ public class HomeController : Controller
 
     public IActionResult ConfigurarJuego()
     {
-        JuegoActual = new Juego();
-        ViewBag.Categorias = Juego.ObtenerCategorias(); 
-        return View();
-    }
-
-    
-
-    public IActionResult Comenzar(string Username, int Categoria)
-    {
-        if (Username == "" || Username == null)
-        {
-            return RedirectToAction("ConfigurarJuego");
-        }
-        else
-        {
-            JuegoActual = new Juego();
-            JuegoActual.CargarPartida(Username, Categoria); 
-            return RedirectToAction("Jugar");
-        }
-    }
-
-    public IActionResult Jugar()
-    {
-        Pregunta pregunta = JuegoActual.ObtenerProximaPregunta();
-
-        if (pregunta == null)
-        {
-            ViewBag.Username = JuegoActual.Username;
-            ViewBag.Puntaje = JuegoActual.PuntajeActual;
-            return View("Fin");
-        }
-
-        List<Respuesta> respuestas = JuegoActual.ObtenerProximasRespuestas(pregunta.IdPregunta);
-
-        ViewBag.Username = JuegoActual.Username;
-        ViewBag.Puntaje = JuegoActual.PuntajeActual;
-        ViewBag.NroPregunta = JuegoActual.NroPreguntaActual;
-        ViewBag.Pregunta = pregunta;
-        ViewBag.Respuestas = respuestas;
-
-        return View("Juego");
+        ViewBag.Categorias = BD.ObtenerCategorias();
+        return View("ConfigurarJuego");
     }
 
     [HttpPost]
-    public IActionResult VerificarRespuesta(int idPregunta, int idRespuesta)
+    public IActionResult Comenzar(string Username, int Categoria)
     {
-        bool esCorrecta = JuegoActual.VerificarRespuesta(idRespuesta);
-        ViewBag.Correcta = esCorrecta;
-        ViewBag.Username = JuegoActual.Username;
-        ViewBag.Puntaje = JuegoActual.PuntajeActual;
+        Juego juego = new Juego();
+        juego.CargarPartida(Username, Categoria);
 
-        return View("Respuesta");
+        HttpContext.Session.SetString("Jueg", Objeto.ObjectToString(juego));
+
+        return RedirectToAction("Jugar");
+    }
+
+    [HttpPost]
+    public IActionResult Jugar()
+    {
+        Juego juego = Objeto.StringToObject<Juego>(HttpContext.Session.GetString("Jueg"));
+
+        if (juego.ListaPreguntas.Count == 0)
+        {
+            HttpContext.Session.SetString("Jueg", Objeto.ObjectToString(juego));
+            ViewBag.Username = juego.Username;
+            ViewBag.Puntaje = juego.PuntajeActual;
+            return View("Fin");
+        }
+        else
+        {
+            Pregunta preguntaActual = juego.ObtenerProximaPregunta();
+            ViewBag.PreguntaActual = preguntaActual;
+
+            ViewBag.ListaRespuestas = juego.ObtenerProximasRespuestas(preguntaActual.IdPregunta);
+
+            HttpContext.Session.SetString("Jueg", Objeto.ObjectToString(juego));
+
+            ViewBag.Username = juego.Username;
+            ViewBag.Puntaje = juego.PuntajeActual;
+
+            return View("Juego");
+        }
+    }
+
+    [HttpPost]
+    public IActionResult VerificarRespuesta(int idRespuesta)
+    {
+        Juego juego = Objeto.StringToObject<Juego>(HttpContext.Session.GetString("Jueg"));
+
+        ViewBag.Correcta = juego.VerificarRespuesta(idRespuesta);
+
+        Pregunta preguntaActual = juego.ObtenerProximaPregunta();
+        ViewBag.PreguntaActual = preguntaActual;
+
+        if (preguntaActual != null)
+        ViewBag.ListaRespuestas = juego.ObtenerProximasRespuestas(preguntaActual.IdPregunta);
+
+        HttpContext.Session.SetString("Jueg", Objeto.ObjectToString(juego));
+
+        ViewBag.Username = juego.Username;
+        ViewBag.Puntaje = juego.PuntajeActual;
+
+        return View("Juego");
     }
 }

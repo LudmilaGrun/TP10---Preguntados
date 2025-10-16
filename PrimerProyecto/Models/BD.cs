@@ -1,61 +1,61 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Data.SqlClient;
 using Dapper;
-using Microsoft.Data.SqlClient;
-using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace Proyecto.Models
+
+namespace PrimerProyecto.Models;
+
+public class BD
 {
-    public static class BD{
     private static string _connectionString = @"A-PHZ2-CIDI-36";
 
-   
-    public static List<Categoria> ObtenerCategorias1(){
-        List<Categoria> Categorias = new List<Categoria>();
-
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                string query = "SELECT * FROM Categorias";
-                Categorias = connection.Query<Categoria>(query).ToList();
-            }
-
-            return Categorias;
-    }
-
-    public static List<Pregunta> ObtenerPreguntas(int Categoria){
-        List<Pregunta> Preguntas = new List<Pregunta>();
+    public static List<Categoria> ObtenerCategorias()
+    {
+        List<Categoria> ListaCategorias = new List<Categoria>();
 
         using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                if (Categoria == -1)
-                {
-                    string query = "SELECT * FROM Preguntas";
-                    Preguntas = connection.Query<Pregunta>(query).ToList();
-                }
-                else
-                {
-                    string query = "SELECT * FROM Preguntas WHERE IdCategoria = @pCategoria";
-                    Preguntas = connection.Query<Pregunta>(query, new { pCategoria = Categoria }).ToList();
-                }
-            }
+        {
+            string query = "SELECT * FROM Categorias";
+            ListaCategorias = connection.Query<Categoria>(query).ToList();
+        }
 
-            return Preguntas;
+        return ListaCategorias;
     }
 
-    public static List<Respuesta> ObtenerRespuestas(int idPregunta){
-        List<Respuesta> Respuestas = new List<Respuesta>();
+    public static List<Pregunta> ObtenerPreguntas(int categoria)
+    {
+        List<Pregunta> ListaPreguntas = new List<Pregunta>();
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query;
+
+            if (categoria == -1)
             {
-                string query = "SELECT * FROM Respuestas WHERE IdPregunta = @pidPregunta";
-                Respuestas = connection.Query<Respuesta>(query, new { pidPregunta = idPregunta }).ToList();
+                query = "SELECT * FROM Preguntas";
+                ListaPreguntas = connection.Query<Pregunta>(query).ToList();
             }
+            else
+            {
+                query = "SELECT * FROM Preguntas WHERE IdCategoria = @Categoria";
+                ListaPreguntas = connection.Query<Pregunta>(query, new { Categoria = categoria }).ToList();
+            }
+        }
 
-            return Respuestas;
+        return ListaPreguntas;
+    }
+
+    public static List<Respuesta> ObtenerRespuestas(int idPregunta)
+    {
+        List<Respuesta> ListaRespuestas = new List<Respuesta>();
+
+        using (SqlConnection connection = new SqlConnection(_connectionString))
+        {
+            string query = "SELECT * FROM Respuestas WHERE IdPregunta = @idPregunta";
+            ListaRespuestas = connection.Query<Respuesta>(query, new { idPregunta }).ToList();
+        }
+
+        return ListaRespuestas;
     }
 }
-}
-   
-  

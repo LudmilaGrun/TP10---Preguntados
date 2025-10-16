@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+
+namespace PrimerProyecto.Models;
 public class Pregunta{
     public int IdPregunta { get; set; }
     public int IdCategorias { get; set; }

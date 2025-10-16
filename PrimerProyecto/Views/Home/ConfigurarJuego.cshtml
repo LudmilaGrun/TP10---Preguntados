@@ -1,6 +1,6 @@
 @{
     ViewData["Title"] = "ConfigurarJuego";
-    var categorias = ViewBag.Categorias as List<TP10_PreguntadORT.Models.Categoria>;
+    var categorias = ViewBag.Categorias as List<PrimerProyecto.Models.Categoria>;
 }
 
 <h1>Configurar Juego</h1>
@@ -14,9 +14,9 @@
         <option value="-1">Todas</option>
         @if (categorias != null)
         {
-            foreach (var c in categorias)
+            foreach (var categoria in categorias)
             {
-                <option value="@c.IdCategoria">@c.Nombre</option>
+                <option value="@categoria.IdCategoria">@categoria.Nombre</option>
             }
         }
     </select>

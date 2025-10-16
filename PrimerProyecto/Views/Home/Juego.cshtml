@@ -1,42 +1,23 @@
 @{
     ViewData["Title"] = "Juego";
-    string username = ViewBag.Username;
-    int puntaje = ViewBag.Puntaje;
-    int nro = ViewBag.NroPregunta;
-    Pregunta pregunta = ViewBag.Pregunta as Pregunta;
-    var respuestas = ViewBag.Respuestas as List<Respuesta>;
 }
 
-<h1>Juego</h1>
+<div id="juego">
+    <p>Nombre de usuario: @ViewBag.Username</p>
+    <p>Puntaje actual: @ViewBag.PuntajeActual</p>
+    <img src="@ViewBag.Foto" alt="Foto"/>
+    <p>Número de pregunta: @ViewBag.PreguntaActual.Id</p>
+    <p>@ViewBag.PreguntaActual.Enunciado</p>
 
-<p>Usuario: @username</p>
-<p>Puntaje: @puntaje</p>
-<p>Pregunta @nro:</p>
-<p>@pregunta.Enunciado</p>
-
-@if (!string.IsNullOrEmpty(pregunta.Foto))
-{
-    <img src="~/img/@pregunta.Foto" alt="foto" />
-}
-
-<form method="post" action='@Url.Action("VerificarRespuesta","Home")'>
-    <input type="hidden" name="idPregunta" value="@pregunta.IdPregunta" />
-
-    @if (respuestas != null)
-    {
-        foreach (var r in respuestas)
+    <form method="post" action='@Url.Action("VerificarRespuesta", "Home")'>
+        @foreach (var respuesta in ViewBag.ListaRespuesta)
         {
-            <p>
-                <input type="radio" name="idRespuesta" value="@r.IdRespuesta" required /> @r.Contenido
-                @if (!string.IsNullOrEmpty(r.Foto))
-                {
-                    <div>
-                        <img src="~/img/@r.Foto" alt="fotoRespuesta" />
-                    </div>
-                }
-            </p>
+            <button type="submit" name="idRespuesta" value="@respuesta.IdRespuesta">
+                @respuesta.Contenido
+            </button>
         }
-    }
 
-    <p><button type="submit">Responder</button></p>
-</form>
+        <button type="submit" class="enviar"> Enviar Respuesta </button>
+    </form>
+    
+</div>

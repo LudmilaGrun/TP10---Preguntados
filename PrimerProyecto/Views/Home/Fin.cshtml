@@ -1,14 +1,15 @@
 @{
     ViewData["Title"] = "Index";
 }
-<p>@ViewBag.username</p>
-<p>Puntaje final: @ViewBag.PuntajeActual</p>
 
+<div>
+    <p>Jugador: @ViewBag.username</p>
+    <p>Puntaje final: @ViewBag.PuntajeActual</p>
 
-<form method="get" action='@Url.Action("ConfigurarJuego","Home")'>
-    <p><button type="submit">Volver a jugar</button></p>
-</form>
-
+    <form method="get" action='@Url.Action("ConfigurarJuego", "Home")'>
+        <button type="submit">Volver a jugar</button>
+    </form>
+</div>
 
 
 
