@@ -4,70 +4,91 @@ namespace PrimerProyecto.Models
 {
     public class Juego
     {
-        public string Username { get; private set; }
-        public int PuntajeActual { get; private set; }
-        public int CantidadPreguntasCorrectas { get; private set; }
-        public int ContadorNroPreguntaActual { get; private set; }
-        public Pregunta PreguntaActual { get; private set; }
-        public List<Pregunta> ListaPreguntas { get; private set; }
-        public List<Respuesta> ListaRespuestas { get; private set; }
-        public List<Respuesta> RespuestasActual { get; private set; }
+        // Propiedades públicas
+        public string Username { get; set; }
+        public int PuntajeActual { get; set; }
+        public int CantidadPreguntasCorrectas { get; set; }
+        public int ContadorNroPreguntaActual { get; set; }
+        public Pregunta PreguntaActual { get; set; }
+        public List<Pregunta> ListaPreguntas { get; set; }
+        public List<Respuesta> RespuestasActual { get; set; }
 
+        // Constructor
         public Juego()
         {
             InicializarJuego();
         }
 
+        // Inicializa todas las propiedades
         private void InicializarJuego()
         {
-            Username = null;
+            Username = "";
             PuntajeActual = 0;
             CantidadPreguntasCorrectas = 0;
             ContadorNroPreguntaActual = 0;
             PreguntaActual = null;
             ListaPreguntas = new List<Pregunta>();
-            ListaRespuestas = new List<Respuesta>();
             RespuestasActual = new List<Respuesta>();
         }
 
+        // Carga las preguntas según la categoría y asigna la primera pregunta
         public void CargarPartida(string username, int categoria)
         {
             InicializarJuego();
             Username = username;
-            ListaPreguntas = BD.ObtenerPreguntas(categoria);
+
+            if (categoria == -1)
+                ListaPreguntas = BD.ObtenerPreguntasTodas();
+            else
+                ListaPreguntas = BD.ObtenerPreguntas(categoria);
+
+            if (ListaPreguntas == null || ListaPreguntas.Count == 0)
+            {
+                ListaPreguntas = new List<Pregunta>();
+                PreguntaActual = null;
+                RespuestasActual = new List<Respuesta>();
+                return;
+            }
+
+            // Inicializar la primera pregunta
+            ContadorNroPreguntaActual = 0;
+            PreguntaActual = ListaPreguntas[0];
+            RespuestasActual = BD.ObtenerRespuestas(PreguntaActual.IdPregunta);
         }
 
+        // Devuelve las categorías disponibles
         public List<Categoria> ObtenerCategorias()
         {
             return BD.ObtenerCategorias();
         }
 
+        // Avanza a la siguiente pregunta si existe
         public Pregunta ObtenerProximaPregunta()
         {
-            if (ListaPreguntas != null && ContadorNroPreguntaActual < ListaPreguntas.Count)
+            if (ContadorNroPreguntaActual + 1 < ListaPreguntas.Count)
             {
-                PreguntaActual = ListaPreguntas[ContadorNroPreguntaActual];
                 ContadorNroPreguntaActual++;
+                PreguntaActual = ListaPreguntas[ContadorNroPreguntaActual];
+                RespuestasActual = BD.ObtenerRespuestas(PreguntaActual.IdPregunta);
                 return PreguntaActual;
             }
+
+            // No hay más preguntas
+            PreguntaActual = null;
+            RespuestasActual = new List<Respuesta>();
             return null;
         }
 
-        public List<Respuesta> ObtenerProximasRespuestas(int idPregunta)
-        {
-            RespuestasActual = BD.ObtenerRespuestas(idPregunta);
-            return RespuestasActual;
-        }
-
+        // Verifica si la respuesta elegida es correcta
         public bool VerificarRespuesta(int idRespuesta)
         {
             bool correcta = false;
 
             if (RespuestasActual != null)
             {
-                foreach (var respuesta in RespuestasActual)
+                foreach (var r in RespuestasActual)
                 {
-                    if (respuesta.Correcta && respuesta.IdRespuesta == idRespuesta)
+                    if (r.Correcta && r.IdRespuesta == idRespuesta)
                     {
                         correcta = true;
                         PuntajeActual += 10;
@@ -77,10 +98,21 @@ namespace PrimerProyecto.Models
                 }
             }
 
+            // Solo avanzamos si hay más preguntas
+            if (ContadorNroPreguntaActual + 1 < ListaPreguntas.Count)
+            {
+                ObtenerProximaPregunta();
+            }
+            else
+            {
+                PreguntaActual = null;
+                RespuestasActual = new List<Respuesta>();
+            }
+
             return correcta;
         }
 
-
+        // Devuelve el ID de la pregunta más baja
         public int ObtenerIdPreguntaMasChico()
         {
             if (ListaPreguntas == null || ListaPreguntas.Count == 0)

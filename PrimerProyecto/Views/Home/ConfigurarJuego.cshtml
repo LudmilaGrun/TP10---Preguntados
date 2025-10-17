@@ -1,17 +1,17 @@
 @{
     ViewData["Title"] = "ConfigurarJuego";
-    var categorias = ViewBag.Categorias as List<PrimerProyecto.Models.Categoria>;
+    var categorias = ViewBag.Categorias as List<Categoria>;
 }
 
 <h1>Configurar Juego</h1>
 
-<form method="get" action='@Url.Action("Comenzar","Home")'>
+<form method="post" action='@Url.Action("Comenzar","Home")'>
     <p>Nombre:</p>
-    <input type="text" name="username" required />
+    <input type="text" name="Username" required />
 
     <p>Categoría:</p>
-    <select name="categoria" required>
-        <option value="-1">Todas</option>
+    <select name="Categoria" required>
+    <option value="-1">Todas</option>
         @if (categorias != null)
         {
             foreach (var categoria in categorias)
@@ -21,5 +21,5 @@
         }
     </select>
 
-    <p><button type="submit">Jugar</button></p>
+    <p><button type="submit">Comenzar</button></p>
 </form>

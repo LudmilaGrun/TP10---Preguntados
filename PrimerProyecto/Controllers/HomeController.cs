@@ -27,57 +27,63 @@ public class HomeController : Controller
     [HttpPost]
     public IActionResult Comenzar(string Username, int Categoria)
     {
+        if (string.IsNullOrEmpty(Username))
+        {
+             return RedirectToAction("ConfigurarJuego");
+        }
+
         Juego juego = new Juego();
         juego.CargarPartida(Username, Categoria);
 
-        HttpContext.Session.SetString("Jueg", Objeto.ObjectToString(juego));
+        if (juego.ListaPreguntas.Count == 0)
+        {
+            return View("Fin");
+        }
 
+        HttpContext.Session.SetString("Juego", Objeto.ObjectToString(juego));
         return RedirectToAction("Jugar");
     }
 
-    [HttpPost]
+    [HttpGet]
     public IActionResult Jugar()
     {
-        Juego juego = Objeto.StringToObject<Juego>(HttpContext.Session.GetString("Jueg"));
+        string juego1 = HttpContext.Session.GetString("Juego");
+        if (string.IsNullOrEmpty(juego1))
+            return RedirectToAction("ConfigurarJuego");
 
-        if (juego.ListaPreguntas.Count == 0)
+        Juego juego = Objeto.StringToObject<Juego>(juego1);
+
+        if (juego.PreguntaActual == null) 
         {
-            HttpContext.Session.SetString("Jueg", Objeto.ObjectToString(juego));
-            ViewBag.Username = juego.Username;
-            ViewBag.Puntaje = juego.PuntajeActual;
             return View("Fin");
         }
-        else
-        {
-            Pregunta preguntaActual = juego.ObtenerProximaPregunta();
-            ViewBag.PreguntaActual = preguntaActual;
 
-            ViewBag.ListaRespuestas = juego.ObtenerProximasRespuestas(preguntaActual.IdPregunta);
+        ViewBag.PreguntaActual = juego.PreguntaActual;
+        ViewBag.ListaRespuestas = juego.RespuestasActual;
+        ViewBag.Username = juego.Username;
+        ViewBag.Puntaje = juego.PuntajeActual;
 
-            HttpContext.Session.SetString("Jueg", Objeto.ObjectToString(juego));
-
-            ViewBag.Username = juego.Username;
-            ViewBag.Puntaje = juego.PuntajeActual;
-
-            return View("Juego");
-        }
+        return View("Juego");
     }
 
     [HttpPost]
     public IActionResult VerificarRespuesta(int idRespuesta)
     {
-        Juego juego = Objeto.StringToObject<Juego>(HttpContext.Session.GetString("Jueg"));
+        string juego2 = HttpContext.Session.GetString("Juego");
+        if (string.IsNullOrEmpty(juego2))
+            return RedirectToAction("ConfigurarJuego");
 
-        ViewBag.Correcta = juego.VerificarRespuesta(idRespuesta);
+        Juego juego = Objeto.StringToObject<Juego>(juego2);
 
-        Pregunta preguntaActual = juego.ObtenerProximaPregunta();
-        ViewBag.PreguntaActual = preguntaActual;
+        juego.VerificarRespuesta(idRespuesta);
 
-        if (preguntaActual != null)
-        ViewBag.ListaRespuestas = juego.ObtenerProximasRespuestas(preguntaActual.IdPregunta);
+        HttpContext.Session.SetString("Juego", Objeto.ObjectToString(juego));
 
-        HttpContext.Session.SetString("Jueg", Objeto.ObjectToString(juego));
+        if (juego.PreguntaActual == null) 
+            return View("Fin");
 
+        ViewBag.PreguntaActual = juego.PreguntaActual;
+        ViewBag.ListaRespuestas = juego.RespuestasActual;
         ViewBag.Username = juego.Username;
         ViewBag.Puntaje = juego.PuntajeActual;
 

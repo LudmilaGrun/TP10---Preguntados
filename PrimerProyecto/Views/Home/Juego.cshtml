@@ -4,20 +4,30 @@
 
 <div id="juego">
     <p>Nombre de usuario: @ViewBag.Username</p>
-    <p>Puntaje actual: @ViewBag.PuntajeActual</p>
-    <img src="@ViewBag.Foto" alt="Foto"/>
+    <p>Puntaje actual: @ViewBag.Puntaje</p>
+
+    @if (ViewBag.PreguntaActual.Foto != "")
+    {
+        <img src="@ViewBag.PreguntaActual.Foto" alt="Foto" />
+    }
+
     <p>Número de pregunta: @ViewBag.PreguntaActual.Id</p>
     <p>@ViewBag.PreguntaActual.Enunciado</p>
 
     <form method="post" action='@Url.Action("VerificarRespuesta", "Home")'>
-        @foreach (var respuesta in ViewBag.ListaRespuesta)
+        @foreach (var respuesta in ViewBag.ListaRespuestas)
         {
-            <button type="submit" name="idRespuesta" value="@respuesta.IdRespuesta">
+            <div>
+                <input type="radio" name="idRespuesta" value="@respuesta.IdRespuesta" />
                 @respuesta.Contenido
-            </button>
+                @if (respuesta.Foto != "")
+                {
+                    <img src="@respuesta.Foto" alt="Foto de la respuesta"/>
+                }
+            </div>
         }
-
-        <button type="submit" class="enviar"> Enviar Respuesta </button>
+        <button type="submit">Enviar Respuesta</button>
     </form>
-    
 </div>
+
+

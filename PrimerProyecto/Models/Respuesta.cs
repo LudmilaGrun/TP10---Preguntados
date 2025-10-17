@@ -9,6 +9,11 @@ public class Respuesta{
     public bool Correcta { get; set; }
     public string Foto { get; set; }
     
+    public Respuesta ()
+    {
+
+    }
+
     public Respuesta (int pIdPregunta, int pOpcion, string pContenido, bool pCorrecta, string pFoto)
     {
         IdPregunta = pIdPregunta;
